@@ -9,15 +9,16 @@ Training notebook for a master's thesis on **semantic segmentation of road scene
 ## Table of contents
 
 1. [Overview](#overview)
-2. [Method](#method)
-3. [Data](#data)
-4. [Model](#model)
-5. [Notebook walkthrough](#notebook-walkthrough)
-6. [Configuration reference](#configuration-reference)
-7. [Running the notebook](#running-the-notebook)
-8. [Metrics and logging](#metrics-and-logging)
-9. [Reproducibility](#reproducibility)
-10. [References](#references)
+2. [Results](#results)
+3. [Method](#method)
+4. [Data](#data)
+5. [Model](#model)
+6. [Notebook walkthrough](#notebook-walkthrough)
+7. [Configuration reference](#configuration-reference)
+8. [Running the notebook](#running-the-notebook)
+9. [Metrics and logging](#metrics-and-logging)
+10. [Reproducibility](#reproducibility)
+11. [References](#references)
 
 ---
 
@@ -39,6 +40,24 @@ Key ingredients implemented in the notebook:
 - **Confidence-adaptive mixing**: CutMix box size and ClassMix class selection depend on the teacher's confidence.
 - Two **unlabeled-loss weighting** schemes: per-image fraction of confident pixels, or a **Laplace-style per-pixel weighting** that drops the least confident pixels.
 - Fully seeded, deterministic-mode training with PyTorch Lightning.
+
+## Results
+
+![alt text](assets/seg-results.png)
+
+We can visually confirm improvements in the segmentation of the obtained model, that performes better segmentation of animals (red class), resulting in fewer instances where pixels are misclassified as vehicles (yellow class); it also produces more structured predictions for roadside objects (purple class)—such as road signs, billboards, etc.—as shown in the first and third rows. Additionally, the final model offers other minor improvements, such as a more accurate distinction between the pedestrian area (brown class) and the roadway (light green class) in the first row, or better segmentation of a person (red class) in the bottom-left area of ​​the image in the third row.
+
+| -             |    Supervised pretrain | Model 1  | Model 2  | Model 3 | Model 4 | Model 5 |
+|---------------|------------------------|----------|----------|---------|---------|---------|
+| CutMix type   | –                      | Ordinary | Prob     | Prob    | Prob    | Prob    |
+| ClassMix type | –                      | Ordinary | Ordinary | Object  | Prob    | Max     |
+| mIoU          | 65.94                  | 68.16    | 68.84    | 68.58   | 68.49   | 68.18   |
+| Dice score    | 77.05                  | 78.8     | 79.39    | 79.22   | 79.14   | 78.88   |
+| Accuracy      | 76.71                  | 77.9     | 78.85    | 78.57   | 78.46   | 78.85   |
+| Precision     | 77.47                  | 79.98    | 80.2     | 80.12   | 80.07   | 79.08   |
+| mIoU gain     | –                      | 2.22     | 2.9      | 2.64    | 2.55    | 2.24    |
+
+We were able to obtain a quantative and qualitative increase in model segmentation capabilities, using purely unlabeled images, despite the harsh constraints such as usage of very small amount of data (which is further amplified by the data hunger of ViT) and low-throughput GPU.
 
 ## Method
 
